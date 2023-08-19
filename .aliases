@@ -1,0 +1,11 @@
+alias fup="sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y && sudo snap refresh && brew update && brew upgrade"
+alias dclean='docker rm -f $(docker ps -aq) && docker rmi -f $(docker images -q)'
+
+alias fastdeploy='git add . && git commit -m "new commit" && clever deploy && clever open'
+alias astrobd='npm run build && rm -rf clever/* && cp -r dist/* clever'
+
+alias gi='git init'
+alias gac='git add . && git commit -m $1'
+alias gp='git push'
+alias gs='git switch'
+alias gri='git rebase -i'
