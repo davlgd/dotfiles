@@ -1,11 +1,75 @@
-alias fup="sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y && sudo snap refresh && brew update && brew upgrade"
-alias dclean='docker rm -f $(docker ps -aq) && docker rmi -f $(docker images -q)'
+# Detect the distribution
+if [[ -f /etc/os-release ]]; then
+    . /etc/os-release
+fi
 
+update_cmd=''
+
+# Aliases for Debian and its derivatives
+if [[ "$ID" == "debian" || "$ID" == "ubuntu" ]]; then
+    update_cmd='sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y && sudo snap refresh'
+    alias i='sudo apt install' 
+fi
+
+# Aliases for Archlinux and Manjaro
+if [[ "$ID" == "arch" || "$ID" == "manjaro" ]]; then
+    update_cmd='sudo pacman -Syu'
+    alias i='sudo pacman -S'
+fi
+
+# Aliases for Fedora
+if [[ "$ID" == "fedora" ]]; then
+    update_cmd='sudo dnf update'
+    alias i='sudo dnf install'
+fi
+
+# Check for Brew
+if command -v brew &> /dev/null; then
+    update_cmd+=' && brew update && brew upgrade'
+fi
+
+# Check for Rust
+if command -v rustup &> /dev/null; then
+    update_cmd+=' && rustup update'
+fi
+
+# Check for V
+if command -v v &> /dev/null; then
+    update_cmd+=' && v up'
+fi
+
+alias up=$update_cmd
 alias fastdeploy='git add . && git commit -m "new commit" && clever deploy && clever open'
 alias astrobd='npm run build && rm -rf clever/* && cp -r dist/* clever'
 
-alias gi='git init'
-alias gac='git add . && git commit -m $1'
+alias gl='git log --oneline --all --graph --decorate'
+alias gac='git add . && git commit -m'
 alias gp='git push'
 alias gs='git switch'
 alias gri='git rebase -i'
+
+alias c='ncal -wb'
+alias h='history | grep'
+alias ll='ls -lah --color=auto'
+alias f='find / -type f -name 2> /dev/null'
+alias usage='du -hsx * | sort -rh'
+alias serve='python3 -m http.server'
+alias sshtunnel='ssh -D 8080 -f -C -q -N'
+alias top5='ps auxf | sort -nr -k 4 | head -5'
+alias dclean='docker rm -f $(docker ps -aq) && docker rmi -f $(docker images -q)'
+alias bigfiles='find /home -type f -exec du -h 2>/dev/null {} + | sort -rh | head -n 50'
+
+# Chemin du dossier contenant les scripts
+SCRIPTS_DIR="$HOME/dotfiles/scripts/"
+
+# Vérifie si le dossier existe
+if [[ -d $SCRIPTS_DIR ]]; then
+    # Source chaque script .sh dans le dossier
+    for script in "$SCRIPTS_DIR"/*.sh; do
+        if [[ -f $script ]]; then
+            source "$script"
+        fi
+    done
+else
+    echo "Erreur: Le dossier $SCRIPTS_DIR n'existe pas."
+fi
